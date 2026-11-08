@@ -68,6 +68,8 @@ The version is bumped inside the pull request, never by pushing to `main`. In yo
 1. Set the new version in `backend/app/__init__.py`, and run `npm version X.Y.Z --no-git-tag-version` in `frontend/`.
 2. Add your changes to `CHANGELOG.md` under a new `## [X.Y.Z] - YYYY-MM-DD` heading.
 
+The **Version check** in CI enforces this from the branch name. For a breaking change, add the `breaking` label to the pull request.
+
 After the pull request is merged, tag the merge commit and publish the release:
 
 ```bash
