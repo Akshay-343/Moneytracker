@@ -1,8 +1,7 @@
-"""Create (or reset) a demo account filled with ~6 months of realistic data.
+"""Create (or reset) a local account with about six months of sample data.
 
-Usage: python -m app.seed_demo [email] [password]
-Defaults to demo@example.com / demo1234. Re-running wipes the demo user and rebuilds it relative to today,
-so the dashboard always shows current data. Never touches other users.
+Usage: python -m app.seed [email] [password]
+Re-running rebuilds that account relative to today. Other users are never touched.
 """
 import random
 import sys
@@ -18,8 +17,8 @@ from app.core.db import SessionLocal
 from app.models import Account, Attachment, Budget, Category, Goal, Notification, RecurringRule, Subscription, Transaction, Transfer, User
 from app.services.dates import advance
 
-DEMO_EMAIL = "demo@example.com"
-DEMO_PASSWORD = "demo1234"
+SAMPLE_EMAIL = "sample@example.com"
+SAMPLE_PASSWORD = "sample1234"
 
 # (category, notes, min, max, times per month)
 SPENDING = [
@@ -35,11 +34,11 @@ def _d(v: float) -> Decimal:
     return Decimal(str(round(v, 2)))
 
 
-def seed(db: Session, email: str = DEMO_EMAIL, password: str = DEMO_PASSWORD, today: date | None = None) -> User:
+def seed(db: Session, email: str = SAMPLE_EMAIL, password: str = SAMPLE_PASSWORD, today: date | None = None) -> User:
     today = today or date.today()
     rng = random.Random(42)
     if old := db.scalar(select(User).where(User.email == email)):
-        # explicit child deletes: SQLite does not enforce ON DELETE CASCADE unless foreign keys are switched on
+        # SQLite does not enforce ON DELETE CASCADE, so delete children explicitly
         for model in (Attachment, Transaction, Transfer, Subscription, RecurringRule, Budget, Goal, Account, Category, Notification):
             db.execute(delete(model).where(model.user_id == old.id))
         db.execute(delete(User).where(User.id == old.id))
@@ -104,9 +103,9 @@ def seed(db: Session, email: str = DEMO_EMAIL, password: str = DEMO_PASSWORD, to
 
 
 if __name__ == "__main__":
-    email = sys.argv[1] if len(sys.argv) > 1 else DEMO_EMAIL
-    password = sys.argv[2] if len(sys.argv) > 2 else DEMO_PASSWORD
+    email = sys.argv[1] if len(sys.argv) > 1 else SAMPLE_EMAIL
+    password = sys.argv[2] if len(sys.argv) > 2 else SAMPLE_PASSWORD
     with SessionLocal() as session:
         seed(session, email, password)
-    # Only echo the well-known demo password, never one passed on the command line.
-    print(f"Demo account ready: {email} / {DEMO_PASSWORD}" if password == DEMO_PASSWORD else f"Demo account ready: {email}")
+    # Never echo a password passed on the command line.
+    print(f"Sample account ready: {email} / {SAMPLE_PASSWORD}" if password == SAMPLE_PASSWORD else f"Sample account ready: {email}")

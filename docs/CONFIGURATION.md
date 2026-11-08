@@ -3,14 +3,6 @@
 Pursely reads all settings from environment variables. Locally, put them in `.env` (copied from
 [`.env.example`](../.env.example)); on a hosting platform, set them in its dashboard. Never commit real secrets.
 
-## Demo mode
-
-Set `DEMO_MODE=true` to show a **Try the demo** button on the sign-in page. It signs visitors into a shared account
-(`demo@example.com`) with six months of sample data. The data is rebuilt when the API starts and every 24 hours,
-so whatever visitors change is temporary. Real accounts are never touched.
-
-You can also (re)build the demo data by hand: `python -m app.seed_demo`.
-
 ## Email (welcome, password reset, reminders) with Gmail
 1. Turn on 2-Step Verification for the Gmail account, then create an **App Password** at
    https://myaccount.google.com/apppasswords. Google shows 16 characters in groups of four; paste them **without spaces**.

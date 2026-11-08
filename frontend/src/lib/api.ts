@@ -95,15 +95,11 @@ export async function fetchBlobUrl(path: string): Promise<string> {
   return URL.createObjectURL(await res.blob());
 }
 
-export type AuthConfig = { google_client_id: string; email_enabled: boolean; demo: boolean; ai_enabled: boolean };
+export type AuthConfig = { google_client_id: string; email_enabled: boolean; ai_enabled: boolean };
 export const authConfig = () => api<AuthConfig>("/auth/config");
 
 export async function googleLogin(credential: string) {
   const body = await api("/auth/google", { body: { credential } });
-  tokens.set(body.access_token, body.refresh_token);
-}
-export async function demoLogin() {
-  const body = await api("/auth/demo", { method: "POST" });
   tokens.set(body.access_token, body.refresh_token);
 }
 export type AiTip = { title: string; detail: string; kind: "saving" | "warning" | "positive" };

@@ -9,7 +9,7 @@ import { resetPassword, tokens } from "@/lib/api";
 export default function ResetPassword() {
   const nav = useNavigate();
   const [params] = useSearchParams();
-  // Keep the token in memory only: strip it from the address bar so it does not linger in history or leak via Referer.
+  // Remove the token from the URL so it does not stay in history or leak via Referer
   const [token] = useState(params.get("token") ?? "");
   useEffect(() => { if (params.has("token")) history.replaceState(null, "", "/reset-password"); }, [params]);
   const [password, setPassword] = useState("");

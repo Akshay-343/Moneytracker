@@ -33,7 +33,7 @@ def _filtered(user, from_, to, kind, category_id, account_id, q, tag):
     if q:
         stmt = stmt.where(Transaction.note.ilike(f"%{q}%"))
     if tag:
-        # JSON containment is portable enough via text match on the serialized list
+        # text match on the serialized list works on both SQLite and PostgreSQL
         stmt = stmt.where(cast(Transaction.tags, String).ilike(f'%"{tag}"%'))
     return stmt
 
@@ -110,7 +110,7 @@ async def import_csv(file: UploadFile = File(...), db: Session = Depends(get_db)
     accs = {a.name.lower(): a for a in db.scalars(select(Account).where(Account.user_id == user.id))}
     created, errors = 0, []
     for i, row in enumerate(csv.DictReader(io.StringIO(text)), start=2):
-        # Fixed messages per field: the user gets a clear reason and no exception text leaves the server.
+        # Fixed messages per field so no exception text leaves the server
         kind = (row.get("kind") or "expense").strip().lower()
         if kind not in ("expense", "income"):
             errors.append(f"line {i}: kind must be expense or income")

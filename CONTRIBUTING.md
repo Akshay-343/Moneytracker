@@ -5,7 +5,7 @@ Thanks for taking the time to contribute.
 ## Setup
 
 Follow [Getting started](README.md#getting-started) to run the backend and frontend locally.
-`python -m app.seed_demo` fills the database with sample data (login `demo@example.com` / `demo1234`).
+`python -m app.seed` fills the database with sample data (login `sample@example.com` / `sample1234`).
 
 ## Before opening a pull request
 

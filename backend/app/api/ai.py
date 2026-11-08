@@ -15,7 +15,7 @@ from app.services.ratelimit import RateLimiter
 router = APIRouter(prefix="/ai", tags=["ai"])
 
 ai_limiter = RateLimiter(settings.ai_requests_per_hour, 3600, "You've reached the hourly limit for AI requests. Try again later.")
-# (user id, date) -> (fingerprint of the data the tips were made from, tips). Tips change when the data does.
+# (user id, date) -> (data fingerprint, tips); tips refresh when the data changes
 _tips_cache: dict[tuple[int, date], tuple[str, dict]] = {}
 
 

@@ -23,7 +23,6 @@ class Settings(BaseSettings):
     groq_api_key: str = ""   # empty turns the AI features off
     groq_model: str = "openai/gpt-oss-120b"
     ai_requests_per_hour: int = 20   # per user, to stay inside Groq's free tier
-    demo_mode: bool = False   # public demo: "Try the demo" button, demo data reset at startup and daily
 
 
 settings = Settings()

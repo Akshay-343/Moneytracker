@@ -24,7 +24,7 @@ class RateLimiter:
 
 
 def client_ip(request: Request) -> str:
-    # Behind Caddy/nginx the real address is in X-Forwarded-For; the proxy is the only thing that can set it in our deployment.
+    # Behind the reverse proxy the client address is in X-Forwarded-For
     fwd = request.headers.get("x-forwarded-for")
     return fwd.split(",")[0].strip() if fwd else (request.client.host if request.client else "unknown")
 

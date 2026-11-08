@@ -31,7 +31,7 @@ DEFAULT_CATEGORIES = [
     ("Subscriptions", "expense", "#6366f1"), ("Salary", "income", "#22c55e"),
     ("Other Income", "income", "#14b8a6"),
 ]
-# Verified against when the email is unknown, so a login attempt takes about as long either way.
+# Checked when the email is unknown so failed logins take the same time
 _DUMMY_HASH = sec.hash_password("not-a-real-password")
 
 
@@ -63,19 +63,8 @@ def _user_out(u: User) -> UserOut:
 @router.get("/config", response_model=AuthConfig)
 def auth_config():
     """Public values the login page needs. The Google client ID is not a secret."""
-    return AuthConfig(google_client_id=settings.google_client_id, email_enabled=email_enabled(), demo=settings.demo_mode,
+    return AuthConfig(google_client_id=settings.google_client_id, email_enabled=email_enabled(),
                       ai_enabled=bool(settings.groq_api_key))
-
-
-@router.post("/demo", response_model=TokenOut)
-def demo_login(db: Session = Depends(get_db)):
-    """One-click sign-in to the shared demo account. Only exists when DEMO_MODE is on."""
-    from app.seed_demo import DEMO_EMAIL, seed
-
-    if not settings.demo_mode:
-        raise HTTPException(404, "Not found")
-    user = db.scalar(select(User).where(User.email == DEMO_EMAIL)) or seed(db)
-    return _tokens(user)
 
 
 @router.post("/register", response_model=TokenOut, status_code=201)
@@ -118,7 +107,7 @@ def google_login(body: GoogleIn, request: Request, tasks: BackgroundTasks, db: S
         return _tokens(user)
     user = db.scalar(select(User).where(User.email == email))
     if user:
-        # Safe to link: Google asserts it verified this address, and the existing account is keyed by the same address.
+        # Safe to link: Google has verified this address
         user.google_sub, user.email_verified = sub, True
         db.commit()
         return _tokens(user)
@@ -158,7 +147,7 @@ def reset_password(body: ResetIn, request: Request, tasks: BackgroundTasks, db: 
     user = db.get(User, row.user_id)
     user.password_hash = sec.hash_password(body.password)
     user.token_version = (user.token_version or 0) + 1   # signs out every existing session
-    # One use only, and any other outstanding links for this user die with it.
+    # Single use; also invalidates the user's other reset links
     for t in db.scalars(select(PasswordResetToken).where(PasswordResetToken.user_id == user.id, PasswordResetToken.used_at.is_(None))):
         t.used_at = now
     db.commit()

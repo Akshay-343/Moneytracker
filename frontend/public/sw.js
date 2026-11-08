@@ -1,4 +1,4 @@
-// App-shell cache. API traffic is never cached: money data must always be live (or fail visibly).
+// Caches the app shell only; API responses are never cached
 const CACHE = "pursely-shell-v2";
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(["/", "/manifest.webmanifest", "/icon-192.png"])));
@@ -11,7 +11,7 @@ self.addEventListener("fetch", (e) => {
   const req = e.request, url = new URL(req.url);
   if (req.method !== "GET" || url.origin !== location.origin || url.pathname.startsWith("/api/")) return;
   if (req.mode === "navigate") {
-    // network first so a new deploy shows up; fall back to the cached shell when offline
+    // network first, cached shell when offline
     e.respondWith(fetch(req).then((r) => { caches.open(CACHE).then((c) => c.put("/", r.clone())); return r; }).catch(() => caches.match("/")));
     return;
   }

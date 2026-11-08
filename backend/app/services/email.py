@@ -9,7 +9,7 @@ log = logging.getLogger(__name__)
 
 def email_enabled() -> bool:
     if settings.smtp_user and not settings.smtp_password:
-        return False  # a login is configured but its password is not: treat email as off instead of failing every send
+        return False  # a login without a password: treat email as off instead of failing every send
     return bool(settings.smtp_host and settings.smtp_from)
 
 

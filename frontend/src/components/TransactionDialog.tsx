@@ -35,7 +35,7 @@ export default function TransactionDialog({ open, onOpenChange, tx }: { open: bo
         tags: f.tags.split(",").map((t) => t.trim()).filter(Boolean),
       };
       return tx ? api(`/transactions/${tx.id}`, { method: "PUT", body }) : api<Tx>("/transactions", { body }).then(async (t) => {
-        // The transaction exists now; a failed receipt upload must not lose it, so report and keep going.
+        // The transaction is saved; report a failed receipt upload without losing it
         const failed: string[] = [];
         for (const f of files) { try { await uploadAttachment(t.id, f); } catch { failed.push(f.name); } }
         if (failed.length) alert(`Saved, but these receipts failed to upload: ${failed.join(", ")}. Open the transaction to retry.`);

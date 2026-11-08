@@ -116,7 +116,7 @@ Open http://localhost:5173. API docs (Swagger) are at http://localhost:8000/docs
 To fill the app with six months of sample data:
 
 ```bash
-docker compose exec api python -m app.seed_demo   # login: demo@example.com / demo1234
+docker compose exec api python -m app.seed   # login: sample@example.com / sample1234
 ```
 
 ### Without Docker
@@ -131,7 +131,7 @@ source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 export DATABASE_URL=sqlite:///./dev.db   # Windows PowerShell: $env:DATABASE_URL="sqlite:///./dev.db"
 alembic upgrade head
-python -m app.seed_demo            # optional sample data
+python -m app.seed                 # optional sample data
 uvicorn app.main:app --reload
 
 # frontend, in a second terminal (proxies /api to :8000)
@@ -150,7 +150,6 @@ All settings are environment variables (see [`.env.example`](.env.example)). The
 | `SECRET_KEY` | JWT signing key; use `openssl rand -hex 32` |
 | `CORS_ORIGINS` | Comma-separated allowed frontend origins |
 | `APP_URL` | Public URL of the frontend, used in email links |
-| `DEMO_MODE` | `true` shows a **Try the demo** button and resets the demo data daily |
 | `SMTP_*` | Optional email for welcome, password reset and reminders |
 | `GOOGLE_CLIENT_ID` | Optional, enables Sign in with Google |
 | `GROQ_API_KEY` | Optional, enables AI tips and Ask Pursely (free key from [console.groq.com](https://console.groq.com/keys)) |
@@ -181,7 +180,7 @@ CodeQL and dependency audits.
 │   │   ├── services/     # stats, email, templates, rate limiting, ownership checks
 │   │   ├── models.py     # SQLAlchemy models
 │   │   ├── schemas.py    # Pydantic request and response models
-│   │   └── seed_demo.py  # sample-data generator
+│   │   └── seed.py       # sample-data generator
 │   ├── alembic/          # database migrations
 │   └── tests/
 ├── frontend/

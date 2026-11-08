@@ -99,7 +99,7 @@ def test_login_rate_limit(client):
     assert codes[0] == 401 and codes[-1] == 429
 
 
-# ---- Google sign-in -------------------------------------------------------------------------------------------------
+# Google sign-in
 
 def _google(monkeypatch, claims=None, error=None):
     monkeypatch.setattr(settings, "google_client_id", "test-client.apps.googleusercontent.com")
@@ -144,7 +144,7 @@ def test_google_rejects_unverified_invalid_and_unconfigured(client, outbox, monk
     assert client.post(f"{API}/google", json={"credential": CRED}).status_code == 401
     monkeypatch.setattr(settings, "google_client_id", "")
     assert client.post(f"{API}/google", json={"credential": CRED}).status_code == 503
-    assert client.get(f"{API}/config").json() == {"google_client_id": "", "email_enabled": False, "demo": False, "ai_enabled": False}
+    assert client.get(f"{API}/config").json() == {"google_client_id": "", "email_enabled": False, "ai_enabled": False}
 
 
 def test_google_only_user_can_set_a_password_via_reset(client, outbox, monkeypatch):
@@ -159,7 +159,7 @@ def test_google_only_user_can_set_a_password_via_reset(client, outbox, monkeypat
     assert client.post(f"{API}/login", data={"username": "gina@example.com", "password": "my-new-password"}).status_code == 200
 
 
-# ---- Real SMTP code path against a local mail server ------------------------------------------------------------------
+# Real SMTP code path against a local mail server
 
 class _Capture:
     def __init__(self):

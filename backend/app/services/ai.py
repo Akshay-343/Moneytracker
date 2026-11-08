@@ -40,7 +40,7 @@ def enabled() -> bool:
 
 
 def build_context(db, user) -> dict:
-    # The route functions are plain functions, so we reuse their aggregation instead of duplicating it.
+    # Reuse the route functions' aggregation instead of duplicating it
     from app.api.dashboard import budget_status, subscription_summary
     from app.api.insights import overview
 
@@ -72,7 +72,7 @@ def _complete(messages: list[dict], json_mode: bool = False, max_tokens: int = 9
             r = httpx.post(GROQ_URL, json=body, timeout=30,
                            headers={"Authorization": f"Bearer {settings.groq_api_key}"})
             if r.status_code == 429 and attempt == 0:
-                # Free tier is limited per minute; Groq says how long to wait, usually a second or two.
+                # Free tier is rate limited per minute; Groq returns how long to wait
                 time.sleep(min(float(r.headers.get("retry-after", 2)), 5))
                 continue
             break

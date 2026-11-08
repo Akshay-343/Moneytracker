@@ -36,7 +36,6 @@ class ResetIn(BaseModel):
 class AuthConfig(BaseModel):
     google_client_id: str
     email_enabled: bool
-    demo: bool = False
     ai_enabled: bool = False
 
 

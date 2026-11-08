@@ -73,10 +73,3 @@ def _budget_alerts(db: Session, today: date, user_id: int | None):
 def job():
     with SessionLocal() as db:
         run_jobs(db)
-
-
-def reset_demo():
-    from app.seed_demo import seed
-
-    with SessionLocal() as db:
-        seed(db)
