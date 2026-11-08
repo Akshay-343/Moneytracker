@@ -3,6 +3,7 @@ name: CI
 on:
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened, labeled, unlabeled]
   schedule:
     - cron: "0 3 * * 1"   # Mondays 03:00 UTC
   workflow_dispatch:
@@ -15,6 +16,20 @@ permissions:
   contents: read
 
 jobs:
+  version:
+    name: Version check
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: git fetch --depth=1 origin "${{ github.base_ref }}"
+      - run: git show FETCH_HEAD:backend/app/__init__.py > "$RUNNER_TEMP/base_init.py"
+      - run: python3 .github/scripts/check_version.py "$BRANCH" "$RUNNER_TEMP/base_init.py" "$BREAKING"
+        env:
+          BRANCH: ${{ github.head_ref }}
+          BREAKING: ${{ contains(github.event.pull_request.labels.*.name, 'breaking') }}
+
   backend:
     name: Backend (lint + tests on SQLite)
     runs-on: ubuntu-latest
