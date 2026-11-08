@@ -5,6 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app import __version__
 from app.api import accounts_ext, ai, attachments, auth, crud, dashboard, goals, insights, transactions
 from app.core.config import settings
 from app.jobs.scheduler import job
@@ -25,7 +26,7 @@ async def lifespan(app: FastAPI):
         sched.shutdown(wait=False)
 
 
-app = FastAPI(title="Pursely", lifespan=lifespan)
+app = FastAPI(title="Pursely", version=__version__, lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=[o.strip() for o in settings.cors_origins.split(",")],
                    allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
@@ -39,4 +40,4 @@ app.include_router(api)
 
 @app.get("/health")
 def health():
-    return {"ok": True}
+    return {"ok": True, "version": __version__}
