@@ -78,7 +78,20 @@ To cut a release:
    gh release create vX.Y.Z --title "vX.Y.Z" --generate-notes
    ```
    `--generate-notes` lists the pull requests merged since the last release.
-5. Run the **Build and Publish Docker Images** workflow with tag `vX.Y.Z`, then deploy that image tag on Render.
+5. Publishing the release builds the Docker images tagged `vX.Y.Z` and `stable`. Render runs `stable`,
+   so trigger a deploy there once the build finishes.
+
+### Docker images
+
+| Tag | Built from | Used for |
+|---|---|---|
+| `latest` | Every merge to `main` that touches `backend/` or `frontend/` | Testing what is about to ship |
+| `stable`, `vX.Y.Z` | Every published release | Production on Render |
+
+A weekly job deletes every other image, so the registry only ever holds `stable` and `latest`.
+Git tags and GitHub Releases are the permanent history: to roll back, run the publish workflow
+manually from an older tag. Real deletion only happens when the repository variable
+`IMAGE_CLEANUP_ENABLED` is `true`; otherwise the job only lists what it would delete.
 
 ## Reporting bugs and ideas
 

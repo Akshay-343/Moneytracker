@@ -1,0 +1,37 @@
+name: Clean Up Docker Images
+
+# Keeps only the images tagged stable and latest; deletes every other tagged and untagged version.
+# Git tags and GitHub Releases are the permanent record: any old version can be rebuilt from its tag.
+on:
+  schedule:
+    - cron: "0 4 * * 0"   # Sundays 04:00 UTC
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Only list what would be deleted"
+        type: boolean
+        default: true
+
+permissions:
+  packages: write
+
+jobs:
+  cleanup:
+    name: Clean up ${{ matrix.package }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [pursely-api, pursely-web]
+
+    steps:
+      - uses: dataaxiom/ghcr-cleanup-action@v1
+        with:
+          package: ${{ matrix.package }}
+          exclude-tags: stable,latest
+          keep-n-tagged: 0
+          delete-untagged: true
+          # Deletes only when the repository variable IMAGE_CLEANUP_ENABLED is "true"
+          dry-run: ${{ vars.IMAGE_CLEANUP_ENABLED != 'true' || (github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
+          token: ${{ secrets.GITHUB_TOKEN }}
