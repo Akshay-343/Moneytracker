@@ -1,21 +1,31 @@
 version: 2
+
+# One weekly pull request per area, with all minor and patch updates grouped together.
+# Major upgrades usually need code changes, so they are done by hand on a chore/ branch.
 updates:
-  - package-ecosystem: pip
-    directory: /backend
-    schedule: { interval: weekly }
-    open-pull-requests-limit: 5
   - package-ecosystem: npm
     directory: /frontend
     schedule: { interval: weekly }
-    open-pull-requests-limit: 5
     groups:
-      react: { patterns: ["react", "react-dom", "@types/react*"] }
-  - package-ecosystem: docker
+      frontend: { patterns: ["*"] }
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: pip
     directory: /backend
-    schedule: { interval: monthly }
-  - package-ecosystem: docker
-    directory: /frontend
-    schedule: { interval: monthly }
+    schedule: { interval: weekly }
+    groups:
+      backend: { patterns: ["*"] }
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
   - package-ecosystem: github-actions
     directory: /
-    schedule: { interval: monthly }
+    schedule: { interval: weekly }
+    groups:
+      github-actions: { patterns: ["*"] }
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
