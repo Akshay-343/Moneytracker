@@ -1,0 +1,32 @@
+name: Clean Up Backend Images
+
+# Keeps the 2 newest tagged API images (current and previous release) and deletes the rest.
+# Older versions can be rebuilt from their git tag.
+on:
+  schedule:
+    - cron: "0 4 * * 0"   # Sundays 04:00 UTC
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Only list what would be deleted"
+        type: boolean
+        default: true
+
+permissions:
+  packages: write
+
+jobs:
+  cleanup:
+    name: Clean up pursely-api
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: dataaxiom/ghcr-cleanup-action@v1
+        with:
+          package: pursely-api
+          keep-n-tagged: 2
+          delete-untagged: true
+          # Deletes only when the repository variable IMAGE_CLEANUP_ENABLED is "true"
+          dry-run: ${{ vars.IMAGE_CLEANUP_ENABLED != 'true' || (github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
+          token: ${{ secrets.GITHUB_TOKEN }}

@@ -59,26 +59,33 @@ Pursely follows [Semantic Versioning](https://semver.org/): `MAJOR.MINOR.PATCH`.
 | Change | Bump | Example |
 |---|---|---|
 | Breaking change to the API or data that needs users or deployments to adapt | MAJOR | 1.4.2 → 2.0.0 |
-| New feature, backwards compatible | MINOR | 1.4.2 → 1.5.0 |
-| Bug fix or hotfix only | PATCH | 1.4.2 → 1.4.3 |
+| New feature (`feature/` branch) | MINOR | 1.4.2 → 1.5.0 |
+| Bug fix (`bugfix/` or `hotfix/` branch) | PATCH | 1.4.2 → 1.4.3 |
+| `chore/` or `docs/` with no user-visible change | none | 1.4.2 |
 
-The version lives in `backend/app/__init__.py` and `frontend/package.json`, and the running API reports it at `/health`.
+The version is bumped inside the pull request, never by pushing to `main`. In your branch:
 
-To cut a release:
+1. Set the new version in `backend/app/__init__.py`, and run `npm version X.Y.Z --no-git-tag-version` in `frontend/`.
+2. Add your changes to `CHANGELOG.md` under a new `## [X.Y.Z] - YYYY-MM-DD` heading.
 
-1. On a `chore/release-vX.Y.Z` branch, move the `[Unreleased]` entries in `CHANGELOG.md` under a new
-   `## [X.Y.Z] - YYYY-MM-DD` heading and update the compare links at the bottom.
-2. Set the new version in `backend/app/__init__.py` and with `npm version X.Y.Z --no-git-tag-version` in `frontend/`.
-3. Open a pull request titled `Release vX.Y.Z` and merge it.
-4. Tag the merge commit and publish the release:
-   ```bash
-   git switch main && git pull
-   git tag -a vX.Y.Z -m "vX.Y.Z"
-   git push origin vX.Y.Z
-   gh release create vX.Y.Z --title "vX.Y.Z" --generate-notes
-   ```
-   `--generate-notes` lists the pull requests merged since the last release.
-5. Run the **Build and Publish Docker Images** workflow with tag `vX.Y.Z`, then deploy that image tag on Render.
+After the pull request is merged, tag the merge commit and publish the release:
+
+```bash
+git switch main && git pull
+git tag -a vX.Y.Z -m "vX.Y.Z" && git push origin vX.Y.Z
+gh release create vX.Y.Z --title "vX.Y.Z" --generate-notes
+```
+
+The running API reports its version at `/health`.
+
+### Docker images
+
+Only the backend has an image; Render builds the frontend straight from the repository.
+Every merge to `main` that touches `backend/` builds `pursely-api` tagged `vX.Y.Z` and `latest`.
+
+A weekly job keeps the 2 newest images (the current and previous release, for rollback) and deletes the rest.
+Older versions can be rebuilt from their git tag. Real deletion only happens when the repository variable
+`IMAGE_CLEANUP_ENABLED` is `true`; otherwise the job only lists what it would delete.
 
 ## Reporting bugs and ideas
 

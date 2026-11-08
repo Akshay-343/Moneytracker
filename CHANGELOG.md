@@ -26,6 +26,8 @@ First stable release.
 - Installable PWA with a mobile layout and light and dark themes.
 - Portfolio landing page for Netlify.
 - API version reported by `/health`.
+- Backend Docker image published on every merge to `main`, tagged `vX.Y.Z` and `latest`.
+- Weekly registry cleanup that keeps the 2 newest backend images.
 
 ### Removed
 
